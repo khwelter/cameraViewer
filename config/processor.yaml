@@ -1,0 +1,23 @@
+video:
+  source: "0"
+  width: 1280
+  height: 720
+  fps: 30
+  jpeg_quality: 85
+pipeline:
+  steps:
+    - id: step-gaussian
+      enabled: true
+      operation: gaussian_blur
+      params:
+        ksize: 5
+        sigma_x: 1.2
+        sigma_y: 1.2
+    - id: step-canny
+      enabled: false
+      operation: canny
+      params:
+        threshold1: 50
+        threshold2: 120
+        aperture_size: 3
+        l2_gradient: false

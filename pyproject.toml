@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "camera-viewer"
+version = "0.1.0"
+description = "Simple networked OpenCV processor and remote viewer"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "numpy>=1.26.0",
+    "opencv-python>=4.10.0.84",
+    "PyYAML>=6.0.0",
+    "pydantic>=2.8.0",
+    "requests>=2.32.0",
+    "streamlit>=1.36.0",
+    "uvicorn[standard]>=0.30.0",
+]
+
+[project.scripts]
+camera-processor = "camera_viewer.processor:main"
+camera-viewer = "camera_viewer.viewer:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
