@@ -1,17 +1,27 @@
 video:
-  source: '2'
+  source: '0'
+  active_camera: top
+  camera_profiles:
+    bottom:
+      source: '0'
+      resolution_x: 0.00280112
+      resolution_y: 0.00280899
+    top:
+      source: '2'
+      resolution_x: 0.04264392
+      resolution_y: 0.04228330
   fps: 5.0
   jpeg_quality: 85
   crosshair_enabled: false
 pipeline:
   steps:
-  - id: step-1-flip
+  - id: step-1-rotate
     enabled: true
     operation: rotate
     params:
       angle_degrees: 90.0
       scale: 1.0
-  - id: step-canny
+  - id: step-2-flip
     enabled: true
     operation: flip
     params:

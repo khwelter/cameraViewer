@@ -113,6 +113,27 @@ def refresh_remote_data(processor_url: str) -> tuple[dict[str, Any], dict[str, A
     return config, operations
 
 
+def ensure_camera_profiles(config: dict[str, Any]) -> None:
+    video = config.setdefault("video", {})
+    profiles = video.setdefault("camera_profiles", {})
+
+    if "bottom" not in profiles:
+        profiles["bottom"] = {
+            "source": "0",
+            "resolution_x": 0.00280112,
+            "resolution_y": 0.00280899,
+        }
+    if "top" not in profiles:
+        profiles["top"] = {
+            "source": "2",
+            "resolution_x": 0.04264392,
+            "resolution_y": 0.04228330,
+        }
+
+    if video.get("active_camera") not in {"bottom", "top"}:
+        video["active_camera"] = "bottom"
+
+
 def render_app() -> None:
     cli_args = parse_cli_args()
     st.set_page_config(page_title="Camera Viewer", layout="wide")
@@ -164,15 +185,45 @@ def render_app() -> None:
         )
 
     config = copy.deepcopy(st.session_state.config)
+    ensure_camera_profiles(config)
     operations = st.session_state.operations
 
     st.divider()
     st.subheader("Video Settings")
     video_cols = st.columns(4)
-    config["video"]["source"] = video_cols[0].text_input("Source", value=str(config["video"].get("source", "0")))
+    config["video"]["active_camera"] = video_cols[0].selectbox(
+        "Active camera",
+        options=["bottom", "top"],
+        index=0 if config["video"].get("active_camera") == "bottom" else 1,
+    )
     config["video"]["fps"] = float(video_cols[1].number_input("FPS", value=float(config["video"].get("fps") or 0.0), min_value=0.0, step=1.0)) or None
     config["video"]["jpeg_quality"] = int(video_cols[2].slider("JPEG quality", min_value=10, max_value=100, value=int(config["video"].get("jpeg_quality", 85))))
     config["video"]["crosshair_enabled"] = video_cols[3].checkbox("Crosshair", value=bool(config["video"].get("crosshair_enabled", False)))
+
+    st.caption("Per-camera configuration")
+    profile_cols = st.columns(2)
+    bottom = config["video"]["camera_profiles"]["bottom"]
+    top = config["video"]["camera_profiles"]["top"]
+
+    with profile_cols[0]:
+        st.markdown("**Bottom camera (source 0)**")
+        bottom["source"] = st.text_input("Bottom source", value=str(bottom.get("source", "0")), key="bottom-source")
+        bottom["resolution_x"] = float(
+            st.number_input("Bottom resolution X", value=float(bottom.get("resolution_x", 0.00280112)), format="%.8f", key="bottom-resolution-x")
+        )
+        bottom["resolution_y"] = float(
+            st.number_input("Bottom resolution Y", value=float(bottom.get("resolution_y", 0.00280899)), format="%.8f", key="bottom-resolution-y")
+        )
+
+    with profile_cols[1]:
+        st.markdown("**Top camera (source 2)**")
+        top["source"] = st.text_input("Top source", value=str(top.get("source", "2")), key="top-source")
+        top["resolution_x"] = float(
+            st.number_input("Top resolution X", value=float(top.get("resolution_x", 0.04264392)), format="%.8f", key="top-resolution-x")
+        )
+        top["resolution_y"] = float(
+            st.number_input("Top resolution Y", value=float(top.get("resolution_y", 0.04228330)), format="%.8f", key="top-resolution-y")
+        )
 
     editor_tab, raw_tab, catalog_tab = st.tabs(["Editor", "Raw JSON", "Operations"])
 

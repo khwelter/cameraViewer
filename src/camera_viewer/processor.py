@@ -113,13 +113,20 @@ class ProcessorRuntime:
             capture.release()
 
     def _open_capture(self) -> cv2.VideoCapture | None:
-        source = self.config.video.source
+        source = self._active_source()
         capture_source: int | str = int(source) if source.isdigit() else source
         capture = cv2.VideoCapture(capture_source)
         if self.config.video.fps:
             capture.set(cv2.CAP_PROP_FPS, float(self.config.video.fps))
 
         return capture
+
+    def _active_source(self) -> str:
+        active_name = self.config.video.active_camera
+        profile = self.config.video.camera_profiles.get(active_name)
+        if profile is not None:
+            return profile.source
+        return self.config.video.source
 
     def _set_error(self, message: str) -> None:
         with self.lock:
@@ -148,10 +155,8 @@ def _draw_crosshair(frame: object) -> object:
     center_y = height // 2
     color = (0, 255, 255)
     thickness = max(1, min(width, height) // 400)
-    line_length = max(20, min(width, height) // 10)
-
-    cv2.line(image, (center_x - line_length, center_y), (center_x + line_length, center_y), color, thickness)
-    cv2.line(image, (center_x, center_y - line_length), (center_x, center_y + line_length), color, thickness)
+    cv2.line(image, (0, center_y), (width - 1, center_y), color, thickness)
+    cv2.line(image, (center_x, 0), (center_x, height - 1), color, thickness)
     cv2.circle(image, (center_x, center_y), max(4, min(width, height) // 150), color, thickness)
     return image
 

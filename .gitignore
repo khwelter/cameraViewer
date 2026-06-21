@@ -1,0 +1,31 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Local runtime files
+*.log
+config/processor.yaml
+config/processor.local.yaml
+
+# If you want to keep machine-local camera settings out of git,
+# rename your local config to processor.local.yaml and point --config to it.

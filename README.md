@@ -44,6 +44,7 @@ Useful options:
 - `--fps` to request capture frame rate
 - camera resolution stays at the native sensor or stream resolution
 - `--config config/processor.yaml` to persist pipeline changes
+- top and bottom camera profiles are configurable in the viewer
 
 Processor endpoints:
 
@@ -77,6 +78,19 @@ The processor accepts `.json`, `.yaml`, or `.yml` config files.
 {
   "video": {
     "source": "0",
+    "active_camera": "bottom",
+    "camera_profiles": {
+      "bottom": {
+        "source": "0",
+        "resolution_x": 0.00280112,
+        "resolution_y": 0.00280899
+      },
+      "top": {
+        "source": "2",
+        "resolution_x": 0.04264392,
+        "resolution_y": 0.04228330
+      }
+    },
     "fps": 30,
     "jpeg_quality": 85,
     "crosshair_enabled": false
