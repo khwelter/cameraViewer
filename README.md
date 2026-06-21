@@ -41,7 +41,8 @@ Useful options:
 - `--source 0` for the first local webcam
 - `--source rtsp://...` for an RTSP camera
 - `--source video.mp4` for a file
-- `--width`, `--height`, `--fps` to request capture settings
+- `--fps` to request capture frame rate
+- camera resolution stays at the native sensor or stream resolution
 - `--config config/processor.yaml` to persist pipeline changes
 
 Processor endpoints:
@@ -76,10 +77,9 @@ The processor accepts `.json`, `.yaml`, or `.yml` config files.
 {
   "video": {
     "source": "0",
-    "width": 1280,
-    "height": 720,
     "fps": 30,
-    "jpeg_quality": 85
+    "jpeg_quality": 85,
+    "crosshair_enabled": false
   },
   "pipeline": {
     "steps": [

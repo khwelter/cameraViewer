@@ -1,29 +1,19 @@
 video:
-  source: '0'
-  width: 1280
-  height: 720
-  fps: 30.0
+  source: '2'
+  fps: 5.0
   jpeg_quality: 85
+  crosshair_enabled: false
 pipeline:
   steps:
-  - id: step-gaussian
-    enabled: false
-    operation: gaussian_blur
-    params:
-      ksize: 5
-      sigma_x: 1.2
-      sigma_y: 1.2
   - id: step-1-flip
+    enabled: true
+    operation: rotate
+    params:
+      angle_degrees: 90.0
+      scale: 1.0
+  - id: step-canny
     enabled: true
     operation: flip
     params:
-      mode: vertical
-  - id: step-canny
-    enabled: false
-    operation: canny
-    params:
-      threshold1: 50
-      threshold2: 120
-      aperture_size: 3
-      l2_gradient: false
+      mode: both
 

@@ -36,10 +36,9 @@ class PipelineSettings(BaseModel):
 
 class VideoSettings(BaseModel):
     source: str = "0"
-    width: int | None = None
-    height: int | None = None
     fps: float | None = None
     jpeg_quality: int = 85
+    crosshair_enabled: bool = False
 
 
 class ProcessorConfig(BaseModel):

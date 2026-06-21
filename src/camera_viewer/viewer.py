@@ -168,12 +168,11 @@ def render_app() -> None:
 
     st.divider()
     st.subheader("Video Settings")
-    video_cols = st.columns(5)
+    video_cols = st.columns(4)
     config["video"]["source"] = video_cols[0].text_input("Source", value=str(config["video"].get("source", "0")))
-    config["video"]["width"] = int(video_cols[1].number_input("Width", value=int(config["video"].get("width") or 0), min_value=0, step=1)) or None
-    config["video"]["height"] = int(video_cols[2].number_input("Height", value=int(config["video"].get("height") or 0), min_value=0, step=1)) or None
-    config["video"]["fps"] = float(video_cols[3].number_input("FPS", value=float(config["video"].get("fps") or 0.0), min_value=0.0, step=1.0)) or None
-    config["video"]["jpeg_quality"] = int(video_cols[4].slider("JPEG quality", min_value=10, max_value=100, value=int(config["video"].get("jpeg_quality", 85))))
+    config["video"]["fps"] = float(video_cols[1].number_input("FPS", value=float(config["video"].get("fps") or 0.0), min_value=0.0, step=1.0)) or None
+    config["video"]["jpeg_quality"] = int(video_cols[2].slider("JPEG quality", min_value=10, max_value=100, value=int(config["video"].get("jpeg_quality", 85))))
+    config["video"]["crosshair_enabled"] = video_cols[3].checkbox("Crosshair", value=bool(config["video"].get("crosshair_enabled", False)))
 
     editor_tab, raw_tab, catalog_tab = st.tabs(["Editor", "Raw JSON", "Operations"])
 

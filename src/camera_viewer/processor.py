@@ -116,11 +116,6 @@ class ProcessorRuntime:
         source = self.config.video.source
         capture_source: int | str = int(source) if source.isdigit() else source
         capture = cv2.VideoCapture(capture_source)
-
-        if self.config.video.width:
-            capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(self.config.video.width))
-        if self.config.video.height:
-            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(self.config.video.height))
         if self.config.video.fps:
             capture.set(cv2.CAP_PROP_FPS, float(self.config.video.fps))
 
@@ -144,6 +139,23 @@ def _encode_jpeg(frame: object, quality: int) -> bytes | None:
     return buffer.tobytes()
 
 
+def _draw_crosshair(frame: object) -> object:
+    if frame is None:
+        return frame
+    image = frame.copy()
+    height, width = image.shape[:2]
+    center_x = width // 2
+    center_y = height // 2
+    color = (0, 255, 255)
+    thickness = max(1, min(width, height) // 400)
+    line_length = max(20, min(width, height) // 10)
+
+    cv2.line(image, (center_x - line_length, center_y), (center_x + line_length, center_y), color, thickness)
+    cv2.line(image, (center_x, center_y - line_length), (center_x, center_y + line_length), color, thickness)
+    cv2.circle(image, (center_x, center_y), max(4, min(width, height) // 150), color, thickness)
+    return image
+
+
 def _load_config_file(path: Path) -> dict:
     text = path.read_text(encoding="utf-8")
     if path.suffix.lower() in {".yaml", ".yml"}:
@@ -164,6 +176,8 @@ def _stream_frames(runtime: ProcessorRuntime, processed: bool) -> Iterator[bytes
     while not runtime.stop_event.is_set():
         original_frame, processed_frame, _ = runtime.frame_pair()
         frame = processed_frame if processed else original_frame
+        if runtime.current_config().video.crosshair_enabled:
+            frame = _draw_crosshair(frame)
         jpeg = _encode_jpeg(frame, runtime.current_config().video.jpeg_quality)
         if jpeg is None:
             time.sleep(0.05)
@@ -176,10 +190,9 @@ def build_default_config(source: str, width: int | None, height: int | None, fps
     return ProcessorConfig(
         video={
             "source": source,
-            "width": width,
-            "height": height,
             "fps": fps,
             "jpeg_quality": 85,
+            "crosshair_enabled": False,
         },
         pipeline={
             "steps": [
@@ -273,8 +286,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source", default="0", help="OpenCV video source, camera index, URL, or file path")
     parser.add_argument("--host", default="0.0.0.0", help="Host interface for the HTTP server")
     parser.add_argument("--port", type=int, default=8000, help="HTTP server port")
-    parser.add_argument("--width", type=int, default=None, help="Requested capture width")
-    parser.add_argument("--height", type=int, default=None, help="Requested capture height")
     parser.add_argument("--fps", type=float, default=None, help="Requested capture FPS")
     parser.add_argument("--config", default="config/processor.yaml", help="Path to persistent processor config")
     return parser.parse_args()
@@ -283,7 +294,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config_path = Path(args.config) if args.config else None
-    runtime = ProcessorRuntime(config_path, build_default_config(args.source, args.width, args.height, args.fps))
+    runtime = ProcessorRuntime(config_path, build_default_config(args.source, None, None, args.fps))
     app = create_app(runtime)
     uvicorn.run(app, host=args.host, port=args.port)
 
