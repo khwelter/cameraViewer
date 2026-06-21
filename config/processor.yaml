@@ -1,6 +1,6 @@
 video:
   source: '0'
-  active_camera: bottom
+  active_camera: top
   camera_profiles:
     bottom:
       source: '0'
