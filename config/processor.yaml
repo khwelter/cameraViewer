@@ -9,10 +9,10 @@ video:
     top:
       source: '2'
       resolution_x: 0.04264392
-      resolution_y: 0.04228330
+      resolution_y: 0.0422833
   fps: 5.0
   jpeg_quality: 85
-  crosshair_enabled: false
+  crosshair_enabled: true
 pipeline:
   steps:
   - id: step-1-rotate
