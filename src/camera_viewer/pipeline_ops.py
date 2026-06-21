@@ -153,11 +153,20 @@ def op_resize(image: np.ndarray, params: dict[str, Any]) -> np.ndarray:
 
 
 def op_flip(image: np.ndarray, params: dict[str, Any]) -> np.ndarray:
-    return cv2.flip(image, int(params.get("flip_code", 1)))
+    mode = str(params.get("mode", "")).lower()
+    if mode:
+        flip_code = {
+            "horizontal": 1,
+            "vertical": 0,
+            "both": -1,
+        }.get(mode, 1)
+    else:
+        flip_code = int(params.get("flip_code", 1))
+    return cv2.flip(image, flip_code)
 
 
 def op_rotate(image: np.ndarray, params: dict[str, Any]) -> np.ndarray:
-    angle = float(params.get("angle_degrees", 0.0))
+    angle = float(params.get("angle_degrees", 0.0)) % 360.0
     scale = float(params.get("scale", 1.0))
     center = (image.shape[1] / 2.0, image.shape[0] / 2.0)
     matrix = cv2.getRotationMatrix2D(center, angle, scale)
@@ -381,14 +390,14 @@ OPERATION_SPECS: dict[str, OperationSpec] = {
         label="Flip",
         description="Flip vertically, horizontally, or both.",
         parameters={
-            "flip_code": ParameterSpec(type="int", default=1, minimum=-1, maximum=1, step=1, label="Flip code"),
+            "mode": ParameterSpec(type="select", default="horizontal", options=["horizontal", "vertical", "both"], label="Mode"),
         },
     ),
     "rotate": OperationSpec(
         label="Rotate",
         description="Rotate around the image center.",
         parameters={
-            "angle_degrees": ParameterSpec(type="float", default=0.0, minimum=-180.0, maximum=180.0, step=1.0, label="Angle"),
+            "angle_degrees": ParameterSpec(type="float", default=0.0, minimum=0.0, maximum=360.0, step=1.0, label="Angle"),
             "scale": ParameterSpec(type="float", default=1.0, minimum=0.1, maximum=5.0, step=0.1, label="Scale"),
         },
     ),

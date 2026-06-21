@@ -183,17 +183,23 @@ def render_app() -> None:
         removed_index = None
         move_up_index = None
         move_down_index = None
+        move_top_index = None
+        move_bottom_index = None
 
         for index, step in enumerate(steps):
             label = f"Step {index + 1}: {step.get('operation', 'unknown')}"
             with st.expander(label, expanded=index == 0):
                 updated = apply_step_changes(index, step, operations)
-                button_cols = st.columns(3)
-                if button_cols[0].button("Move up", key=f"up-{index}", disabled=index == 0):
+                button_cols = st.columns(5)
+                if button_cols[0].button("Top", key=f"top-{index}", disabled=index == 0):
+                    move_top_index = index
+                if button_cols[1].button("Move up", key=f"up-{index}", disabled=index == 0):
                     move_up_index = index
-                if button_cols[1].button("Move down", key=f"down-{index}", disabled=index == len(steps) - 1):
+                if button_cols[2].button("Move down", key=f"down-{index}", disabled=index == len(steps) - 1):
                     move_down_index = index
-                if button_cols[2].button("Delete", key=f"delete-{index}"):
+                if button_cols[3].button("Bottom", key=f"bottom-{index}", disabled=index == len(steps) - 1):
+                    move_bottom_index = index
+                if button_cols[4].button("Delete", key=f"delete-{index}"):
                     removed_index = index
                 updated_steps.append(updated)
 
@@ -210,12 +216,22 @@ def render_app() -> None:
             del config["pipeline"]["steps"][removed_index]
             st.session_state.config = config
             st.rerun()
+        if move_top_index is not None:
+            step = config["pipeline"]["steps"].pop(move_top_index)
+            config["pipeline"]["steps"].insert(0, step)
+            st.session_state.config = config
+            st.rerun()
         if move_up_index is not None:
             config["pipeline"]["steps"][move_up_index - 1], config["pipeline"]["steps"][move_up_index] = config["pipeline"]["steps"][move_up_index], config["pipeline"]["steps"][move_up_index - 1]
             st.session_state.config = config
             st.rerun()
         if move_down_index is not None:
             config["pipeline"]["steps"][move_down_index + 1], config["pipeline"]["steps"][move_down_index] = config["pipeline"]["steps"][move_down_index], config["pipeline"]["steps"][move_down_index + 1]
+            st.session_state.config = config
+            st.rerun()
+        if move_bottom_index is not None:
+            step = config["pipeline"]["steps"].pop(move_bottom_index)
+            config["pipeline"]["steps"].append(step)
             st.session_state.config = config
             st.rerun()
 

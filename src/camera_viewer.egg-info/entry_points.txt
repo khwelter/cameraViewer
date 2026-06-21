@@ -1,0 +1,3 @@
+[console_scripts]
+camera-processor = camera_viewer.processor:main
+camera-viewer = camera_viewer.viewer:main
