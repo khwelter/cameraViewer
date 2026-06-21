@@ -17,10 +17,13 @@ pipeline:
     enabled: true
     operation: flip
     params:
-      mode: horizontal
+      mode: vertical
   - id: step-canny
-    enabled: true
-    operation: flip
+    enabled: false
+    operation: canny
     params:
-      mode: horizontal
+      threshold1: 50
+      threshold2: 120
+      aperture_size: 3
+      l2_gradient: false
 
